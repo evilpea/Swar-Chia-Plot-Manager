@@ -8,8 +8,8 @@ import subprocess
 from copy import deepcopy
 from datetime import datetime
 
-from plotmanager.library.utilities.objects import Work
-from plotmanager.library.utilities.instrumentation import set_plots_running
+from plotmanager.objects import Work
+from plotmanager.instrumentation import set_plots_running
 
 
 def _contains_in_list(string, lst, case_insensitive=False):

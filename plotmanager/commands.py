@@ -7,14 +7,13 @@ import time
 
 from datetime import datetime, timedelta
 
-from plotmanager.library.parse.configuration import get_config_info
-from plotmanager.library.utilities.configuration import test_configuration
-from plotmanager.library.utilities.exceptions import ManagerError, TerminationException
-from plotmanager.library.utilities.jobs import load_jobs
-from plotmanager.library.utilities.log import analyze_log_dates, check_log_progress, analyze_log_times
-from plotmanager.library.utilities.notifications import send_notifications
-from plotmanager.library.utilities.print import print_view, print_json
-from plotmanager.library.utilities.processes import is_windows, get_manager_processes, get_running_plots, \
+from plotmanager.configuration import get_config_info, test_configuration
+from plotmanager.exceptions import ManagerError, TerminationException
+from plotmanager.jobs import load_jobs
+from plotmanager.log import analyze_log_dates, check_log_progress, analyze_log_times
+from plotmanager.notifications import send_notifications
+from plotmanager.print import print_view, print_json
+from plotmanager.processes import is_windows, get_manager_processes, get_running_plots, \
     start_process, identify_drive, get_system_drives
 
 

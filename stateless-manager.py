@@ -3,10 +3,10 @@ import time
 
 from datetime import datetime, timedelta
 
-from plotmanager.library.parse.configuration import get_config_info
-from plotmanager.library.utilities.jobs import has_active_jobs_and_work, load_jobs, monitor_jobs_to_start
-from plotmanager.library.utilities.log import check_log_progress
-from plotmanager.library.utilities.processes import get_running_plots, get_system_drives
+from plotmanager.configuration import get_config_info
+from plotmanager.jobs import has_active_jobs_and_work, load_jobs, monitor_jobs_to_start
+from plotmanager.log import check_log_progress
+from plotmanager.processes import get_running_plots, get_system_drives
 
 
 chia_location, log_directory, config_jobs, manager_check_interval, max_concurrent, max_for_phase_1, \

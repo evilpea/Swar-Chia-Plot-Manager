@@ -4,11 +4,11 @@ import psutil
 from copy import deepcopy
 from datetime import datetime, timedelta
 
-from plotmanager.library.commands import plots
-from plotmanager.library.utilities.exceptions import InvalidConfigurationSetting
-from plotmanager.library.utilities.processes import identify_drive, is_windows, start_process
-from plotmanager.library.utilities.objects import Job, Work
-from plotmanager.library.utilities.log import get_log_file_name
+from plotmanager import plots
+from plotmanager.exceptions import InvalidConfigurationSetting
+from plotmanager.processes import identify_drive, is_windows, start_process
+from plotmanager.objects import Job, Work
+from plotmanager.log import get_log_file_name
 
 
 def has_active_jobs_and_work(jobs):

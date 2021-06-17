@@ -4,7 +4,7 @@ import json
 
 from datetime import datetime, timedelta
 
-from plotmanager.library.utilities.processes import get_manager_processes
+from plotmanager.processes import get_manager_processes
 
 
 def _get_row_info(pid, running_work, view_settings, as_raw_values=False):

@@ -5,9 +5,9 @@ import psutil
 import re
 import socket
 
-from plotmanager.library.utilities.instrumentation import increment_plots_completed
-from plotmanager.library.utilities.notifications import send_notifications
-from plotmanager.library.utilities.print import pretty_print_time
+from plotmanager.instrumentation import increment_plots_completed
+from plotmanager.notifications import send_notifications
+from plotmanager.print import pretty_print_time
 
 
 def get_log_file_name(log_directory, job, datetime):
