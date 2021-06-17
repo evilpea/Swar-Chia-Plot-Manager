@@ -1,5 +1,6 @@
 import logging
 import psutil
+import socket
 
 from copy import deepcopy
 from datetime import datetime, timedelta
@@ -9,7 +10,8 @@ from plotmanager.exceptions import InvalidConfigurationSetting
 from plotmanager.processes import identify_drive, is_windows, start_process
 from plotmanager.objects import Job, Work
 from plotmanager.log import get_log_file_name
-
+from plotmanager.configuration import get_notifications_settings
+from plotmanager.notifications import send_notifications
 
 def has_active_jobs_and_work(jobs):
     for job in jobs:
@@ -267,6 +269,12 @@ def monitor_jobs_to_start(jobs, running_work, max_concurrent, max_for_phase_1, n
         total_phase_1_count += 1
         next_log_check = datetime.now()
         running_work[work.pid] = work
+
+        send_notifications(
+            title='Plotting task started',
+            body=f'Plotting task started [{work.pid}] on [{socket.gethostname()}]',
+            settings=get_notifications_settings()
+        )
 
     return jobs, running_work, next_job_work, next_log_check
 

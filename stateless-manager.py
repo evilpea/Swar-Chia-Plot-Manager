@@ -1,4 +1,8 @@
 import logging
+
+import psutil
+from plotmanager.print import pretty_print_bytes
+import socket
 import time
 
 from datetime import datetime, timedelta
@@ -7,13 +11,14 @@ from plotmanager.configuration import get_config_info
 from plotmanager.jobs import has_active_jobs_and_work, load_jobs, monitor_jobs_to_start
 from plotmanager.log import check_log_progress
 from plotmanager.processes import get_running_plots, get_system_drives
+from plotmanager.notifications import send_notifications
 
 
 chia_location, log_directory, config_jobs, manager_check_interval, max_concurrent, max_for_phase_1, \
     minimum_minutes_between_jobs, progress_settings, notification_settings, debug_level, view_settings, \
     instrumentation_settings = get_config_info()
 
-logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=debug_level)
+logging.basicConfig(filename='run.log', format='%(asctime)s [%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level=debug_level)
 
 logging.info(f'Debug Level: {debug_level}')
 logging.info(f'Chia Location: {chia_location}')
@@ -31,6 +36,7 @@ logging.info(f'Instrumentation Settings: {instrumentation_settings}')
 logging.info(f'Loading jobs into objects.')
 jobs = load_jobs(config_jobs)
 
+next_periodic_report = datetime.now()
 next_log_check = datetime.now()
 next_job_work = {}
 running_work = {}
@@ -81,6 +87,7 @@ if minimum_minutes_between_jobs and len(running_work.keys()) > 0:
                      f'stagger. Minimum: {minimum_stagger}, Current: {next_job_work[job_name]}')
 
 logging.info(f'Starting loop.')
+
 while has_active_jobs_and_work(jobs):
     # CHECK LOGS FOR DELETED WORK
     logging.info(f'Checking log progress..')
@@ -88,6 +95,25 @@ while has_active_jobs_and_work(jobs):
                        notification_settings=notification_settings, view_settings=view_settings,
                        instrumentation_settings=instrumentation_settings)
     next_log_check = datetime.now() + timedelta(seconds=manager_check_interval)
+
+    # Report from time to time
+    if (datetime.now() > next_periodic_report):
+        totalwork = 0
+        str = ""
+
+        for job in jobs:
+            totalwork = totalwork + job.total_running
+            for pid in job.running_work:
+                work = running_work[pid]
+                str += f'[{work.plot_id[:7]} at {work.progress}] '
+
+        ram_usage = psutil.virtual_memory()
+        send_notifications(
+            title='Plotting report',
+            body=f'Periodic report for [{socket.gethostname()}]. {len(jobs)} jobs, {totalwork} running. CPU usage: {psutil.cpu_percent()}% RAM Usage: {pretty_print_bytes(ram_usage.used, "gb")}/{pretty_print_bytes(ram_usage.total, "gb", 2, "GiB")}({ram_usage.percent}%). {str}',
+            settings=notification_settings
+        )
+        next_periodic_report = datetime.now() + timedelta(seconds=3600)
 
     # DETERMINE IF JOB NEEDS TO START
     logging.info(f'Monitoring jobs to start.')

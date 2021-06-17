@@ -131,6 +131,8 @@ def _check_parameters(parameter, expected_parameters, parameter_type):
         raise InvalidYAMLConfigException(f'Failed to find the following {parameter_type} parameters: '
                                          f'{", ".join(failed_checks)}')
 
+def get_notifications_settings():
+    return _get_notifications_settings(_get_config())
 
 def get_config_info():
     config = _get_config()

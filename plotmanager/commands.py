@@ -7,14 +7,13 @@ import time
 
 from datetime import datetime, timedelta
 
-from plotmanager.configuration import get_config_info, test_configuration
+from plotmanager.configuration import get_config_info, test_configuration, get_notifications_settings
 from plotmanager.exceptions import ManagerError, TerminationException
 from plotmanager.jobs import load_jobs
 from plotmanager.log import analyze_log_dates, check_log_progress, analyze_log_times
 from plotmanager.notifications import send_notifications
 from plotmanager.print import print_view, print_json
-from plotmanager.processes import is_windows, get_manager_processes, get_running_plots, \
-    start_process, identify_drive, get_system_drives
+from plotmanager.processes import is_windows, get_manager_processes, get_running_plots, start_process, identify_drive, get_system_drives
 
 
 def start_manager():
@@ -55,7 +54,7 @@ def start_manager():
 
     send_notifications(
         title='Plot manager started',
-        body=f'Plot Manager has started on {socket.gethostname()}...',
+        body=f'Plot manager [{socket.gethostname()}] started.',
         settings=notification_settings,
     )
     print('Plot Manager has started...')
@@ -63,6 +62,13 @@ def start_manager():
 
 def stop_manager():
     processes = get_manager_processes()
+
+    send_notifications(
+        title='Plot manager stopping',
+        body=f'Plot manager [{socket.gethostname()}] stopped.',
+        settings=get_notifications_settings()
+    )
+
     if not processes:
         print("No manager processes were found.")
         return
