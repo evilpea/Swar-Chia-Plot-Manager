@@ -37,6 +37,7 @@ logging.info(f'Loading jobs into objects.')
 jobs = load_jobs(config_jobs)
 
 next_periodic_report = datetime.now()
+next_file_check = datetime.now()
 next_log_check = datetime.now()
 next_job_work = {}
 running_work = {}
@@ -89,6 +90,7 @@ if minimum_minutes_between_jobs and len(running_work.keys()) > 0:
 logging.info(f'Starting loop.')
 
 while has_active_jobs_and_work(jobs):
+
     # CHECK LOGS FOR DELETED WORK
     logging.info(f'Checking log progress..')
     check_log_progress(jobs=jobs, running_work=running_work, progress_settings=progress_settings,
@@ -104,16 +106,35 @@ while has_active_jobs_and_work(jobs):
         for job in jobs:
             totalwork = totalwork + job.total_running
             for pid in job.running_work:
-                work = running_work[pid]
-                str += f'[{work.plot_id[:7]} at {work.progress}] '
+                if (pid in running_work):
+                    work = running_work[pid]
+                    str += f'[{work.plot_id[:7]}, phase {work.current_phase} on {work.temporary_drive} ({work.progress}), started {work.datetime_start})]\n'
+                #except:
+                #    print("Something went wrong with the jobs listing.")
 
         ram_usage = psutil.virtual_memory()
         send_notifications(
             title='Plotting report',
-            body=f'Periodic report for [{socket.gethostname()}]. {len(jobs)} jobs, {totalwork} running. CPU usage: {psutil.cpu_percent()}% RAM Usage: {pretty_print_bytes(ram_usage.used, "gb")}/{pretty_print_bytes(ram_usage.total, "gb", 2, "GiB")}({ram_usage.percent}%). {str}',
+            body=f'Periodic report for [{socket.gethostname()}].\n{totalwork} plotting tasks running.\nCPU usage: {psutil.cpu_percent()}%\nRAM Usage: {pretty_print_bytes(ram_usage.used, "gb")}/{pretty_print_bytes(ram_usage.total, "gb", 2, "GiB")} ({ram_usage.percent}%). \n{str}',
             settings=notification_settings
         )
         next_periodic_report = datetime.now() + timedelta(seconds=3600)
+
+    # # Check for zombie files
+    # if (datetime.now() > next_file_check):
+
+    #     listOfWork = []
+    #     # create a list of all "work"
+    #     for job in jobs:
+    #         for pid in running_work:
+    #             if (pid in running_work):
+    #                 listOfWork.append(work.plot_id)
+        
+    #     # scan all temp folders
+    #     for job in jobs:
+    #         for    
+
+    #    next_file_check = datetime.now() + timedelta(seconds=30)
 
     # DETERMINE IF JOB NEEDS TO START
     logging.info(f'Monitoring jobs to start.')
