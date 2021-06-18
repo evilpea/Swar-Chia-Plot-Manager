@@ -107,10 +107,11 @@ while has_active_jobs_and_work(jobs):
             totalwork = totalwork + job.total_running
             for pid in job.running_work:
                 if (pid in running_work):
-                    work = running_work[pid]
-                    str += f'[{work.plot_id[:7]}, phase {work.current_phase} on {work.temporary_drive} ({work.progress}), started {work.datetime_start})]\n'
-                #except:
-                #    print("Something went wrong with the jobs listing.")
+                    try:
+                        work = running_work[pid]
+                        str += f'[{work.plot_id[:7]}, phase {work.current_phase} on {work.temporary_drive} ({work.progress}), started {work.datetime_start})]\n'
+                    except:
+                        print("Something went wrong with the jobs listing.")
 
         ram_usage = psutil.virtual_memory()
         send_notifications(
